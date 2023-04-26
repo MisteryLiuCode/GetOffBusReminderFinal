@@ -1,5 +1,5 @@
 server:
-  port: 49032
+  port: 49033
 spring:
   datasource:
     url: jdbc:mysql://101.43.145.108:3306/getoffreminder?useUnicode=true&characterEncoding=UTF-8&useSSL=false

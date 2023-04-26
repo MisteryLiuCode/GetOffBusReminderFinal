@@ -10,7 +10,7 @@ import com.liu.getOffBusReminderFinal.entity.req.LocationReq;
 import com.liu.getOffBusReminderFinal.entity.req.UserReq;
 import com.liu.getOffBusReminderFinal.entity.req.WorkAndHomeLocationReq;
 import com.liu.getOffBusReminderFinal.enums.LocationEnum;
-import com.liu.getOffBusReminderFinal.helper.GetOffBusHelper;
+import com.liu.getOffBusReminderFinal.helper.GetOffBusFinalHelper;
 import com.liu.getOffBusReminderFinal.utils.ConfigUtil;
 import com.liu.getOffBusReminderFinal.utils.IGlobalCache;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +28,10 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class GetOffBusService {
+public class GetOffBusFinalService {
 
     @Resource
-    private GetOffBusHelper getOffBusHelper;
+    private GetOffBusFinalHelper getOffBusFinalHelper;
 
     @Autowired
     private IGlobalCache globalCache;
@@ -46,7 +46,7 @@ public class GetOffBusService {
             userInfoDO=new UserInfoDO();
             userInfoDO.setUserId(userReq.getUserId());
             userInfoDO.setYn(1);
-            String time = getOffBusHelper.getTime();
+            String time = getOffBusFinalHelper.getTime();
             userInfoDO.setAddTime(time);
             log.info("用户入库开始");
             int insert = userInfoMapper.insert(userInfoDO);
@@ -61,11 +61,11 @@ public class GetOffBusService {
         //起始经纬度
         String startPoint = req.getOriLong() + "," + req.getOriLat();
         //获取目的地经纬度
-        String endPoint = getOffBusHelper.getEndPoint(req.getUserId());
+        String endPoint = getOffBusFinalHelper.getEndPoint(req.getUserId());
         if (endPoint.equals("")) {
             return Double.valueOf(0);
         }
-        Double distance = getOffBusHelper.getDistance(startPoint, endPoint,weatherConfig);
+        Double distance = getOffBusFinalHelper.getDistance(startPoint, endPoint,weatherConfig);
         if (distance < 1500 && !globalCache.hasKey("sendMessage")) {
             String url = "https://api.day.app/DMNK5oTh5FV3RvwpxKvxwB/马上到站了";//指定URL
             String result = HttpUtil.createGet(url).execute().body();
@@ -79,7 +79,7 @@ public class GetOffBusService {
     public String getDes(UserReq req) {
         log.info("获取中文目的地入参:{}",JSONObject.toJSONString(req));
         //判断现在时间是上午还是下午，true为上午，false为下午
-        Boolean isAm = getOffBusHelper.des();
+        Boolean isAm = getOffBusFinalHelper.des();
         Configuration weatherConfig = ConfigUtil.getOffBusReminderConfig();
         String des = "";
         if (isAm) {
@@ -99,7 +99,7 @@ public class GetOffBusService {
         String point = req.getOriLong() + "," + req.getOriLat();
         try{
             UserInfoDO userInfoDO = new UserInfoDO();
-            String time = getOffBusHelper.getTime();
+            String time = getOffBusFinalHelper.getTime();
             //如果为上班位置
             if(req.getLocationType().equals(LocationEnum.TYPE_1.getCode())){
                 userInfoDO.setWorkDes(point);
@@ -144,7 +144,7 @@ public class GetOffBusService {
         Configuration weatherConfig = ConfigUtil.getOffBusReminderConfig();
         //我的位置经纬度
         String myPoint = oriLong + "," + oriLat;
-        List<String> nameList = getOffBusHelper.getInputPrompt(myPoint,keywords,weatherConfig);
+        List<String> nameList = getOffBusFinalHelper.getInputPrompt(myPoint,keywords,weatherConfig);
         log.info("获取输入提示结果:{}", JSON.toJSONString(nameList));
         return nameList;
     }

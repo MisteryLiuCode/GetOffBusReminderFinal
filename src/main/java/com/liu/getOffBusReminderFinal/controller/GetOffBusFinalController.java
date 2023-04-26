@@ -7,7 +7,7 @@ import com.liu.getOffBusReminderFinal.entity.req.DistanceReq;
 import com.liu.getOffBusReminderFinal.entity.req.LocationReq;
 import com.liu.getOffBusReminderFinal.entity.req.UserReq;
 import com.liu.getOffBusReminderFinal.entity.req.WorkAndHomeLocationReq;
-import com.liu.getOffBusReminderFinal.service.GetOffBusService;
+import com.liu.getOffBusReminderFinal.service.GetOffBusFinalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -16,10 +16,10 @@ import java.util.List;
 
 @RestController
 @Slf4j
-public class GetOffBusController {
+public class GetOffBusFinalController {
 
     @Resource
-    private GetOffBusService getOffBusService;
+    private GetOffBusFinalService getOffBusFinalService;
 
 
     @RequestMapping("/test")
@@ -33,7 +33,7 @@ public class GetOffBusController {
      */
     @RequestMapping("/saveUserInfo")
     public RespResult<Boolean> saveUserInfo(UserReq userReq) {
-        return new RespResult<>(getOffBusService.saveUser(userReq));
+        return new RespResult<>(getOffBusFinalService.saveUser(userReq));
     }
 
     /**
@@ -41,7 +41,7 @@ public class GetOffBusController {
      */
     @RequestMapping("/getDistance")
     public RespResult<Double> getDistance(DistanceReq req) {
-        return new RespResult<>(getOffBusService.getDistance(req));
+        return new RespResult<>(getOffBusFinalService.getDistance(req));
     }
 
     /**
@@ -50,7 +50,7 @@ public class GetOffBusController {
      */
     @RequestMapping("/getDestination")
     public RespResult<String> getDes(UserReq req) {
-        return new RespResult<>(getOffBusService.getDes(req));
+        return new RespResult<>(getOffBusFinalService.getDes(req));
     }
 
     /**
@@ -58,7 +58,7 @@ public class GetOffBusController {
      */
     @RequestMapping("/saveLocation")
     public RespResult<Integer> saveLocation(WorkAndHomeLocationReq req) {
-        return new RespResult<>(getOffBusService.getLocation(req));
+        return new RespResult<>(getOffBusFinalService.getLocation(req));
     }
 
     /**
@@ -68,7 +68,7 @@ public class GetOffBusController {
     @RequestMapping("/getWorkAndHomeLocation")
     @PrintLog
     public String getWorkAndHomeLocation(LocationReq req){
-        return getOffBusService.getWorkAndHomeLocation(req);
+        return getOffBusFinalService.getWorkAndHomeLocation(req);
     }
 
     /**
@@ -78,6 +78,6 @@ public class GetOffBusController {
     public RespResult<List<String>> inputPrompt(@PathVariable String oriLong,
                                                 @PathVariable String oriLat,
                                                 @PathVariable String keywords){
-        return new RespResult<>(getOffBusService.inputPrompt(oriLong, oriLat, keywords));
+        return new RespResult<>(getOffBusFinalService.inputPrompt(oriLong, oriLat, keywords));
     }
 }

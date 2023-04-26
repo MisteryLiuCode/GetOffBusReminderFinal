@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @date 2023/4/17 14:23
  */
 @Component
-public class GetOffBusHelper {
+public class GetOffBusFinalHelper {
 
     @Resource
     private UserInfoMapper userInfoMapper;

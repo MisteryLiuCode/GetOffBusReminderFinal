@@ -1,5 +1,6 @@
 package com.liu.getOffBusReminderFinal.common;
 
+
 import com.liu.getOffBusReminderFinal.enums.DefaultResponseErrorType;
 
 import java.io.Serializable;

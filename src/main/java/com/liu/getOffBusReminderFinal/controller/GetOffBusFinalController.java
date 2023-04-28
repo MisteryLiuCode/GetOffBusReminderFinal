@@ -1,7 +1,5 @@
 package com.liu.getOffBusReminderFinal.controller;
 
-
-import com.liu.getOffBusReminderFinal.annotation.PrintLog;
 import com.liu.getOffBusReminderFinal.common.RespResult;
 import com.liu.getOffBusReminderFinal.entity.req.DistanceReq;
 import com.liu.getOffBusReminderFinal.entity.req.LocationReq;
@@ -9,7 +7,10 @@ import com.liu.getOffBusReminderFinal.entity.req.UserReq;
 import com.liu.getOffBusReminderFinal.entity.req.WorkAndHomeLocationReq;
 import com.liu.getOffBusReminderFinal.service.GetOffBusFinalService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -66,7 +67,6 @@ public class GetOffBusFinalController {
      * @return
      */
     @RequestMapping("/getWorkAndHomeLocation")
-    @PrintLog
     public String getWorkAndHomeLocation(LocationReq req){
         return getOffBusFinalService.getWorkAndHomeLocation(req);
     }
@@ -80,4 +80,8 @@ public class GetOffBusFinalController {
                                                 @PathVariable String keywords){
         return new RespResult<>(getOffBusFinalService.inputPrompt(oriLong, oriLat, keywords));
     }
+
+
+
+
 }

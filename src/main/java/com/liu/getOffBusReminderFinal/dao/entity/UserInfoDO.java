@@ -14,24 +14,6 @@ public class UserInfoDO {
      * 唯一标识用户编号
      */
     private String userId;
-    /**
-     * 上班中文描述
-     */
-    private String workDesCn;
-    /**
-     * 家位置中文描述
-     */
-    private String homeDesCn;
-
-    /**
-     * 上班经纬度信息
-     */
-    private String workDes;
-
-    /**
-     * 家位置经纬度信息
-     */
-    private String homeDes;
 
     /**
      * 添加时间

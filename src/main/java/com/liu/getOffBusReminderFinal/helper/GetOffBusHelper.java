@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @date 2023/4/17 14:23
  */
 @Component
-public class GetOffBusFinalHelper {
+public class GetOffBusHelper {
 
     @Resource
     private UserInfoMapper userInfoMapper;
@@ -57,10 +57,10 @@ public class GetOffBusFinalHelper {
         UserInfoDO userInfoDO = userInfoMapper.queryByUserId(userId);
         if (isAm) {
             //获取上班目的地经纬度
-            endPoint=userInfoDO.getWorkDes()==null?"":userInfoDO.getWorkDes();
+//            endPoint=userInfoDO.getWorkDes()==null?"":userInfoDO.getWorkDes();
         } else {
             //获取下班目的地经纬度
-            endPoint=userInfoDO.getHomeDes()==null?"":userInfoDO.getHomeDes();
+//            endPoint=userInfoDO.getHomeDes()==null?"":userInfoDO.getHomeDes();
         }
         return endPoint;
     }

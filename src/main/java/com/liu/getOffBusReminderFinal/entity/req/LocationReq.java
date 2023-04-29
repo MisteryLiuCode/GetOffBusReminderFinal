@@ -11,5 +11,7 @@ public class LocationReq {
 
     private String userId;
 
-    private String locationType;
+    private String locationDesCn;
+
+    private String locationDes;
 }

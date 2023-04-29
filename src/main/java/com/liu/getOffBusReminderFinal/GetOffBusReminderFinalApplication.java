@@ -7,9 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @MapperScan("com.liu.getOffBusReminderFinal.dao")
 public class GetOffBusReminderFinalApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(GetOffBusReminderFinalApplication.class, args);
     }
-
 }

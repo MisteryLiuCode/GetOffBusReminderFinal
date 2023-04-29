@@ -2,6 +2,8 @@ package com.liu.getOffBusReminderFinal.dao.entity;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author liushuaibiao
  * @date 2023/4/17 18:43
@@ -18,12 +20,12 @@ public class UserInfoDO {
     /**
      * 添加时间
      */
-    private String addTime;
+    private Date addTime;
 
     /**
      * 修改时间
      */
-    private String updateTime;
+    private Date updateTime;
 
     /**
      * 是否有效  (0否 1是)

@@ -3,7 +3,10 @@ package com.liu.getOffBusReminderFinal.service;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.liu.getOffBusReminderFinal.common.SystemException;
+import com.liu.getOffBusReminderFinal.dao.LocationMapper;
 import com.liu.getOffBusReminderFinal.dao.UserInfoMapper;
+import com.liu.getOffBusReminderFinal.dao.entity.LocationInfoDO;
 import com.liu.getOffBusReminderFinal.dao.entity.UserInfoDO;
 import com.liu.getOffBusReminderFinal.entity.req.DistanceReq;
 import com.liu.getOffBusReminderFinal.entity.req.LocationReq;
@@ -13,13 +16,16 @@ import com.liu.getOffBusReminderFinal.enums.LocationEnum;
 import com.liu.getOffBusReminderFinal.helper.GetOffBusHelper;
 import com.liu.getOffBusReminderFinal.utils.ConfigUtil;
 import com.liu.getOffBusReminderFinal.utils.IGlobalCache;
+import com.liu.getOffBusReminderFinal.utils.IdUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +45,9 @@ public class GetOffBusFinalService {
     @Resource
     private UserInfoMapper userInfoMapper;
 
+    @Resource
+    private LocationMapper locationMapper;
+
     public Boolean saveUser(UserReq userReq){
         log.info("保存用户:{}", JSONObject.toJSONString(userReq));
         UserInfoDO userInfoDO = userInfoMapper.queryByUserId(userReq.getUserId());
@@ -46,13 +55,31 @@ public class GetOffBusFinalService {
             userInfoDO=new UserInfoDO();
             userInfoDO.setUserId(userReq.getUserId());
             userInfoDO.setYn(1);
-            String time = getOffBusHelper.getTime();
-            userInfoDO.setAddTime(time);
+//            String time = getOffBusHelper.getTime();
+            userInfoDO.setAddTime(new Date());
             log.info("用户入库开始");
             int insert = userInfoMapper.insert(userInfoDO);
             return insert==1?true:false;
         }
         return true;
+    }
+
+    public Integer saveLocation(LocationReq locationReq){
+        log.info("保存位置入参:{}",locationReq);
+        //查询用户是否存在
+        UserInfoDO userInfoDO = userInfoMapper.queryByUserId(locationReq.getUserId());
+        if (StringUtils.isEmpty(userInfoDO)){
+            throw new SystemException("用户不存在");
+        }
+        //保存地点位置
+        LocationInfoDO locationInfoDO = new LocationInfoDO();
+        locationInfoDO.setLocationId(IdUtils.snowflakeId());
+        locationInfoDO.setUserId(locationReq.getUserId());
+        locationInfoDO.setLocationDesCn(locationReq.getLocationDesCn());
+        locationInfoDO.setLocationDes(locationReq.getLocationDes());
+        locationInfoDO.setAddTime(new Date());
+        locationInfoDO.setYn(1);
+        return locationMapper.insert(locationInfoDO);
     }
 
     public Double getDistance(DistanceReq req) {
@@ -66,7 +93,7 @@ public class GetOffBusFinalService {
             return Double.valueOf(0);
         }
         Double distance = getOffBusHelper.getDistance(startPoint, endPoint,weatherConfig);
-        if (distance < 1500 && !globalCache.hasKey("sendMessage")) {
+        if (distance < 2000 && !globalCache.hasKey("sendMessage")) {
             String url = "https://api.day.app/DMNK5oTh5FV3RvwpxKvxwB/马上到站了";//指定URL
             String result = HttpUtil.createGet(url).execute().body();
             log.info("发送通知结果：{}", result);
@@ -104,12 +131,12 @@ public class GetOffBusFinalService {
             if(req.getLocationType().equals(LocationEnum.TYPE_1.getCode())){
 //                userInfoDO.setWorkDes(point);
                 userInfoDO.setUserId(req.getUserId());
-                userInfoDO.setUpdateTime(time);
+                userInfoDO.setUpdateTime(new Date());
                 return userInfoMapper.update(userInfoDO);
             }else {
 //                userInfoDO.setHomeDes(point);
                 userInfoDO.setUserId(req.getUserId());
-                userInfoDO.setUpdateTime(time);
+                userInfoDO.setUpdateTime(new Date());
                 return userInfoMapper.update(userInfoDO);
             }
         }catch (Exception e){
@@ -123,16 +150,16 @@ public class GetOffBusFinalService {
         UserInfoDO userInfoDO = userInfoMapper.queryByUserId(req.getUserId());
         try {
             //如果为上班位置
-            if (req.getLocationType().equals(LocationEnum.TYPE_1.getCode())) {
-//                String workDes = userInfoDO.getWorkDes();
-//                log.info("获取的上班位置{}",workDes);
-//                return workDes;
-
-            } else {
-//                String homeDes = userInfoDO.getHomeDes();
-//                log.info("获取的下班位置{}",homeDes);
-//                return homeDes;
-            }
+////            if (req.getLocationType().equals(LocationEnum.TYPE_1.getCode())) {
+////                String workDes = userInfoDO.getWorkDes();
+////                log.info("获取的上班位置{}",workDes);
+////                return workDes;
+//
+////            } else {
+////                String homeDes = userInfoDO.getHomeDes();
+////                log.info("获取的下班位置{}",homeDes);
+////                return homeDes;
+//            }
         } catch (Exception e) {
             e.printStackTrace();
             return "";

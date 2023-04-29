@@ -38,6 +38,15 @@ public class GetOffBusFinalController {
     }
 
     /**
+     * 保存地点信息
+     */
+    @RequestMapping("/saveLocation")
+    public RespResult<Integer> saveLocation(LocationReq locationReq){
+        return new RespResult<>(getOffBusFinalService.saveLocation(locationReq));
+
+    }
+
+    /**
      * 获取直线距离
      */
     @RequestMapping("/getDistance")
@@ -57,10 +66,10 @@ public class GetOffBusFinalController {
     /**
      * 保存上下班位置信息
      */
-    @RequestMapping("/saveLocation")
-    public RespResult<Integer> saveLocation(WorkAndHomeLocationReq req) {
-        return new RespResult<>(getOffBusFinalService.getLocation(req));
-    }
+//    @RequestMapping("/saveLocation")
+//    public RespResult<Integer> saveLocation(WorkAndHomeLocationReq req) {
+//        return new RespResult<>(getOffBusFinalService.getLocation(req));
+//    }
 
     /**
      * 获取位置信息

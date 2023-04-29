@@ -1,43 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.liu.getOffBusReminderFinal.dao.UserInfoMapper">
-    <resultMap type="com.liu.getOffBusReminderFinal.dao.entity.UserInfoDO" id="UserInfoMap">
+<mapper namespace="com.liu.getOffBusReminderFinal.dao.LocationMapper">
+    <resultMap type="com.liu.getOffBusReminderFinal.dao.entity.LocationInfoDO" id="LocationInfoMap">
+        <result property="locationId" column="location_id" jdbcType="VARCHAR"/>
         <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="locationDesCn" column="location_des_cn" jdbcType="VARCHAR"/>
+        <result property="locationDes" column="location_des" jdbcType="VARCHAR"/>
         <result property="addTime" column="add_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
         <result property="yn" column="yn" jdbcType="INTEGER"/>
     </resultMap>
 
     <!--查询单个-->
-    <select id="queryByUserId" resultType="com.liu.getOffBusReminderFinal.dao.entity.UserInfoDO">
+    <select id="queryByUserId" resultMap="LocationInfoMap">
         select
-            user_id, add_time,update_time,yn
-        from t_user_info
+            location_id,user_id,location_des_cn,location_des, add_time,update_time,yn
+        from t_location_info
         where user_id = #{userId}
     </select>
 
     <!--通过实体作为筛选条件查询-->
-    <select id="queryAll" resultMap="UserInfoMap">
+    <select id="queryAll" resultMap="LocationInfoMap">
         select
-        user_id,add_time,update_time,yn
-        from t_user_info
+        location_id,user_id,location_des_cn,location_des, add_time,update_time,yn
+        from t_location_info
         <where>
             <if test="userId != null">
                 and userId = #{user_id}
-            </if>
-            <if test="name != null and name != ''">
-                and name = #{name}
-            </if>
-            <if test="age != null">
-                and age = #{age}
             </if>
         </where>
     </select>
 
     <!--新增所有列-->
     <insert id="insert" >
-        insert into t_user_info(user_id,add_time,update_time,yn)
-        values (#{userId}, #{addTime},#{updateTime}, #{yn})
+        insert into t_location_info(location_id,user_id,location_des_cn,location_des, add_time,update_time,yn)
+        values (#{locationId},#{userId},#{locationDesCn},#{locationDes},#{addTime},#{updateTime},#{yn})
     </insert>
 
     <!--通过主键修改数据-->
@@ -56,7 +53,7 @@
 
     <!--通过主键删除-->
     <delete id="deleteById">
-        delete from t_user_info where user_id = #{userId}
+        delete from t_location_info where location_id = #{locationId}
     </delete>
 
 </mapper>

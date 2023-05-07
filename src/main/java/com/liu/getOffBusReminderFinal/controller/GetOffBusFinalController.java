@@ -5,6 +5,7 @@ import com.liu.getOffBusReminderFinal.entity.req.DistanceReq;
 import com.liu.getOffBusReminderFinal.entity.req.LocationReq;
 import com.liu.getOffBusReminderFinal.entity.req.UserReq;
 import com.liu.getOffBusReminderFinal.entity.req.WorkAndHomeLocationReq;
+import com.liu.getOffBusReminderFinal.entity.resp.AllDistance;
 import com.liu.getOffBusReminderFinal.service.GetOffBusFinalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,10 +42,28 @@ public class GetOffBusFinalController {
      * 保存地点信息
      */
     @RequestMapping("/saveLocation")
-    public RespResult<Integer> saveLocation(LocationReq locationReq){
+    public RespResult<String> saveLocation(LocationReq locationReq){
         return new RespResult<>(getOffBusFinalService.saveLocation(locationReq));
 
     }
+    /**
+     * 批量计算距离
+     */
+    @RequestMapping("/getAllDistance")
+    public RespResult<List<AllDistance>> getAllDistance(DistanceReq req) {
+        return new RespResult<>(getOffBusFinalService.getAllDistance(req));
+    }
+
+
+
+    /**
+     * 编辑地点信息
+     */
+//    @RequestMapping("/ editLocation")
+//    public RespResult<Integer> editLocation(LocationReq locationReq){
+//        return new RespResult<>(getOffBusFinalService.editLocation(locationReq));
+//    }
+
 
     /**
      * 获取直线距离

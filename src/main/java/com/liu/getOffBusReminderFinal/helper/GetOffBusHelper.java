@@ -3,7 +3,9 @@ package com.liu.getOffBusReminderFinal.helper;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.liu.getOffBusReminderFinal.dao.LocationMapper;
 import com.liu.getOffBusReminderFinal.dao.UserInfoMapper;
+import com.liu.getOffBusReminderFinal.dao.entity.LocationInfoDO;
 import com.liu.getOffBusReminderFinal.dao.entity.UserInfoDO;
 import com.liu.getOffBusReminderFinal.entity.Root;
 import com.liu.getOffBusReminderFinal.entity.Tips;
@@ -26,6 +28,11 @@ public class GetOffBusHelper {
 
     @Resource
     private UserInfoMapper userInfoMapper;
+
+    @Resource
+    private LocationMapper locationMapper;
+
+
 
 
     /**
@@ -54,13 +61,10 @@ public class GetOffBusHelper {
         Boolean isAm = des();
         String endPoint = "";
         String s = "";
-        UserInfoDO userInfoDO = userInfoMapper.queryByUserId(userId);
+        LocationInfoDO locationInfoDO = locationMapper.queryById(userId);
         if (isAm) {
             //获取上班目的地经纬度
-//            endPoint=userInfoDO.getWorkDes()==null?"":userInfoDO.getWorkDes();
-        } else {
-            //获取下班目的地经纬度
-//            endPoint=userInfoDO.getHomeDes()==null?"":userInfoDO.getHomeDes();
+            endPoint=locationInfoDO.getLocationDes()==null?"":locationInfoDO.getLocationDes();
         }
         return endPoint;
     }

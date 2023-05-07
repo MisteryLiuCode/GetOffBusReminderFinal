@@ -14,4 +14,8 @@ public class LocationReq {
     private String locationDesCn;
 
     private String locationDes;
+
+    private Integer sort;
+
+    private String subwayLine;
 }

@@ -12,13 +12,21 @@ import java.util.List;
 @Repository
 public interface LocationMapper {
 
+
     /**
-     * 通过ID查询单条数据
+     * 根据 id 查询位置
+     * @param id
+     * @return
+     */
+   LocationInfoDO queryById(String id);
+
+    /**
+     * 通过用户ID查询单条数据
      *
-     * @param locationId 主键
+     * @param userId
      * @return 实例对象
      */
-    LocationInfoDO queryLocationById(String locationId);
+    List<LocationInfoDO> queryByUserId(String userId);
 
     /**
      * 查询指定行数据
@@ -36,7 +44,7 @@ public interface LocationMapper {
      * @param student 实例对象
      * @return 对象列表
      */
-    List<LocationInfoDO> queryAll(LocationInfoDO locationInfoDO);
+    List<LocationInfoDO> queryAllByUserId(LocationInfoDO locationInfoDO);
 
     /**
      * 新增数据

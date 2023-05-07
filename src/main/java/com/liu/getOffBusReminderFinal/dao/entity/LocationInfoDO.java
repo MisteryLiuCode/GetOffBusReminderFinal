@@ -16,6 +16,10 @@ public class LocationInfoDO {
 
     private String locationDes;
 
+    private Integer sort;
+
+    private String subwayLine;
+
     private Date addTime;
 
     private Date updateTime;

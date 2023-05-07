@@ -6,21 +6,31 @@
         <result property="userId" column="user_id" jdbcType="VARCHAR"/>
         <result property="locationDesCn" column="location_des_cn" jdbcType="VARCHAR"/>
         <result property="locationDes" column="location_des" jdbcType="VARCHAR"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="subwayLine" column="subway_line" jdbcType="VARCHAR"/>
         <result property="addTime" column="add_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
         <result property="yn" column="yn" jdbcType="INTEGER"/>
     </resultMap>
 
-    <!--查询单个-->
+    <!--根据id查询位置-->
+    <select id="queryById" resultMap="LocationInfoMap">
+        select
+            location_id,user_id,location_des_cn,location_des,sort,subway_line,add_time,update_time,yn
+        from t_location_info
+        where location_id = #{locationId}
+    </select>
+
+    <!--根据用户id查询位置-->
     <select id="queryByUserId" resultMap="LocationInfoMap">
         select
-            location_id,user_id,location_des_cn,location_des, add_time,update_time,yn
+            location_id,user_id,location_des_cn,location_des,sort,subway_line,add_time,update_time,yn
         from t_location_info
         where user_id = #{userId}
     </select>
 
     <!--通过实体作为筛选条件查询-->
-    <select id="queryAll" resultMap="LocationInfoMap">
+    <select id="queryAllByUserId" resultMap="LocationInfoMap">
         select
         location_id,user_id,location_des_cn,location_des, add_time,update_time,yn
         from t_location_info
@@ -33,8 +43,8 @@
 
     <!--新增所有列-->
     <insert id="insert" >
-        insert into t_location_info(location_id,user_id,location_des_cn,location_des, add_time,update_time,yn)
-        values (#{locationId},#{userId},#{locationDesCn},#{locationDes},#{addTime},#{updateTime},#{yn})
+        insert into t_location_info(location_id,user_id,location_des_cn,location_des,subway_line,sort,add_time,update_time,yn)
+        values (#{locationId},#{userId},#{locationDesCn},#{locationDes},#{subwayLine},#{sort},#{addTime},#{updateTime},#{yn})
     </insert>
 
     <!--通过主键修改数据-->

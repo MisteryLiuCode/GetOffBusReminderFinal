@@ -26,7 +26,7 @@
         select
             location_id,user_id,location_des_cn,location_des,sort,subway_line,add_time,update_time,yn
         from t_location_info
-        where user_id = #{userId} and location_des != null
+        where user_id = #{userId} and location_des is not null
         order by sort
     </select>
 

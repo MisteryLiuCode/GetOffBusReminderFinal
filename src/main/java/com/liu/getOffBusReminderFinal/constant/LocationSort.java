@@ -5,6 +5,7 @@ public interface LocationSort {
     String nextSort = "nextSort";
 
     String message = "message";
+    String alwMessage = "alwMessage";
 
 
 }

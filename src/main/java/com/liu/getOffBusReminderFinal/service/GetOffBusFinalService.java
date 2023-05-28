@@ -151,20 +151,23 @@ public class GetOffBusFinalService {
             }
             //获取目的地经纬度信息
             String locationKey = locationInfoDO.getLocationId() + LocationSort.message;
+            String alwLocationKey = locationInfoDO.getLocationId() + LocationSort.alwMessage;
             String endPoint = locationInfoDO.getLocationDes();
             Double distance = getOffBusHelper.getDistance(startPoint, endPoint, weatherConfig);
+            log.info("计算顺序为{}，距离为{}",locationInfoDO.getSort(),distance);
             if (distance < 2000 && !globalCache.hasKey(locationKey)) {
-                String url = "https://api.day.app/DMNK5oTh5FV3RvwpxKvxwB/马上到站了";//指定URL
+                String url = "https://api.day.app/rGFEQo4A9yvep2fHcxqEne/马上到站了";//指定URL
                 String result = HttpUtil.createGet(url).execute().body();
                 log.info("发送通知结果：{}", result);
                 globalCache.set(locationKey, true, 1800);
             }
-            if (distance < 800) {
-                String url = "https://api.day.app/DMNK5oTh5FV3RvwpxKvxwB/即将下车了!";//指定URL
+            if (distance < 800 && !globalCache.hasKey(alwLocationKey)) {
+                String url = "https://api.day.app/rGFEQo4A9yvep2fHcxqEne/即将下车了!";//指定URL
                 for (int i = 0; i < 3; i++) {
                     String result = HttpUtil.createGet(url).execute().body();
                     log.info("连续发送通知结果：{}", result);
                 }
+                globalCache.set(alwLocationKey, true, 1800);
             }
             log.info("距离为：{}", distance);
         }

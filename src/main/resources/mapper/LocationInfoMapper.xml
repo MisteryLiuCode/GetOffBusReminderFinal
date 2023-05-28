@@ -26,7 +26,8 @@
         select
             location_id,user_id,location_des_cn,location_des,sort,subway_line,add_time,update_time,yn
         from t_location_info
-        where user_id = #{userId}
+        where user_id = #{userId} and location_des != null
+        order by sort
     </select>
 
     <!--通过实体作为筛选条件查询-->
@@ -49,16 +50,37 @@
 
     <!--通过主键修改数据-->
     <update id="update">
-        update t_user_info
+        update t_location_info
         <set>
+            <if test="locationId != null and locationId != ''">
+                location_id = #{locationId,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="locationDesCn != null and locationDesCn != ''">
+                location_des_cn = #{locationDesCn,jdbcType=VARCHAR},
+            </if>
+            <if test="locationDes != null and locationDes != ''">
+                location_des = #{locationDes,jdbcType=VARCHAR},
+            </if>
+            <if test="subwayLine != null and subwayLine != ''">
+                subway_line = #{subwayLine,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null and sort != ''">
+                sort = #{sort,jdbcType=INTEGER},
+            </if>
             <if test="addTime != null">
                 add_time = #{addTime,jdbcType=TIMESTAMP},
             </if>
             <if test="updateTime != null">
                 update_time = #{updateTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="yn != null and yn != ''">
+                yn = #{yn,jdbcType=INTEGER},
+            </if>
         </set>
-        where user_id = #{userId}
+        where location_id = #{locationId}
     </update>
 
     <!--通过主键删除-->

@@ -1,10 +1,7 @@
 package com.liu.getOffBusReminderFinal.controller;
 
 import com.liu.getOffBusReminderFinal.common.RespResult;
-import com.liu.getOffBusReminderFinal.entity.req.DistanceReq;
-import com.liu.getOffBusReminderFinal.entity.req.LocationReq;
-import com.liu.getOffBusReminderFinal.entity.req.UserReq;
-import com.liu.getOffBusReminderFinal.entity.req.WorkAndHomeLocationReq;
+import com.liu.getOffBusReminderFinal.entity.req.*;
 import com.liu.getOffBusReminderFinal.entity.resp.AllDistance;
 import com.liu.getOffBusReminderFinal.service.GetOffBusFinalService;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +22,13 @@ public class GetOffBusFinalController {
 
 
     @RequestMapping("/test")
-    public RespResult<String> test(){
+    public RespResult<String> test() {
         return new RespResult<>("success");
     }
 
     /**
      * 保存用户,第一次打开的时候保存用户基本信息
+     *
      * @return
      */
     @RequestMapping("/saveUserInfo")
@@ -42,39 +40,46 @@ public class GetOffBusFinalController {
      * 保存地点信息
      */
     @RequestMapping("/saveLocation")
-    public RespResult<String> saveLocation(LocationReq locationReq){
+    public RespResult<String> saveLocation(LocationReq locationReq) {
         return new RespResult<>(getOffBusFinalService.saveLocation(locationReq));
 
     }
-    /**
-     * 批量计算距离
-     */
-    @RequestMapping("/getAllDistance")
-    public RespResult<List<AllDistance>> getAllDistance(DistanceReq req) {
-        return new RespResult<>(getOffBusFinalService.getAllDistance(req));
-    }
-
-
 
     /**
      * 编辑地点信息
      */
-//    @RequestMapping("/ editLocation")
-//    public RespResult<Integer> editLocation(LocationReq locationReq){
-//        return new RespResult<>(getOffBusFinalService.editLocation(locationReq));
-//    }
+    @RequestMapping("/editLocation")
+    public RespResult<Boolean> editLocation(EditLocationReq locationReq) {
+        return new RespResult<>(getOffBusFinalService.editLocation(locationReq));
+    }
 
+    /**
+     * 批量计算距离(弃用)
+     */
+//    @RequestMapping("/getAllDistance")
+//    public RespResult<List<AllDistance>> getAllDistance(DistanceReq req) {
+//        return new RespResult<>(getOffBusFinalService.getAllDistance(req));
+//    }
 
     /**
      * 获取直线距离
      */
     @RequestMapping("/getDistance")
-    public RespResult<Double> getDistance(DistanceReq req) {
+    public RespResult<Boolean> getDistance(DistanceReq req) {
         return new RespResult<>(getOffBusFinalService.getDistance(req));
     }
 
     /**
+     * 初始化位置信息(弃用)
+     */
+//    @RequestMapping("/initDistance")
+//    public RespResult<Boolean> initDistance(DistanceReq req) {
+//        return new RespResult<>(getOffBusFinalService.initDistance(req));
+//    }
+
+    /**
      * 读取目的地，中文
+     *
      * @return
      */
     @RequestMapping("/getDestination")
@@ -92,10 +97,11 @@ public class GetOffBusFinalController {
 
     /**
      * 获取位置信息
+     *
      * @return
      */
     @RequestMapping("/getWorkAndHomeLocation")
-    public String getWorkAndHomeLocation(LocationReq req){
+    public String getWorkAndHomeLocation(LocationReq req) {
         return getOffBusFinalService.getWorkAndHomeLocation(req);
     }
 
@@ -105,11 +111,7 @@ public class GetOffBusFinalController {
     @RequestMapping("/inputPrompt/{oriLong}/{oriLat}/{keywords}")
     public RespResult<List<String>> inputPrompt(@PathVariable String oriLong,
                                                 @PathVariable String oriLat,
-                                                @PathVariable String keywords){
+                                                @PathVariable String keywords) {
         return new RespResult<>(getOffBusFinalService.inputPrompt(oriLong, oriLat, keywords));
     }
-
-
-
-
 }

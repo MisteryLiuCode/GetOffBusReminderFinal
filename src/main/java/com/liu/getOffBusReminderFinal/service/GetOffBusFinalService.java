@@ -4,14 +4,12 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.liu.getOffBusReminderFinal.common.SystemException;
+import com.liu.getOffBusReminderFinal.constant.LocationSort;
 import com.liu.getOffBusReminderFinal.dao.LocationMapper;
 import com.liu.getOffBusReminderFinal.dao.UserInfoMapper;
 import com.liu.getOffBusReminderFinal.dao.entity.LocationInfoDO;
 import com.liu.getOffBusReminderFinal.dao.entity.UserInfoDO;
-import com.liu.getOffBusReminderFinal.entity.req.DistanceReq;
-import com.liu.getOffBusReminderFinal.entity.req.LocationReq;
-import com.liu.getOffBusReminderFinal.entity.req.UserReq;
-import com.liu.getOffBusReminderFinal.entity.req.WorkAndHomeLocationReq;
+import com.liu.getOffBusReminderFinal.entity.req.*;
 import com.liu.getOffBusReminderFinal.entity.resp.AllDistance;
 import com.liu.getOffBusReminderFinal.enums.LocationEnum;
 import com.liu.getOffBusReminderFinal.helper.GetOffBusHelper;
@@ -26,9 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author liushuaibiao
@@ -87,6 +83,23 @@ public class GetOffBusFinalService {
         return locationInfoDO.getLocationId();
     }
 
+    public Boolean editLocation(EditLocationReq locationReq) {
+        log.info("编辑位置入参:{}", locationReq);
+        //查询位置是否存在
+        LocationInfoDO locationInfoDO = locationMapper.queryById(locationReq.getLocationId());
+        if (StringUtils.isEmpty(locationInfoDO)) {
+            throw new SystemException("要修改的位置信息不存在");
+        }
+        //保存地点位置
+        locationInfoDO.setLocationDesCn(locationReq.getLocationDesCn());
+        locationInfoDO.setLocationDes(locationReq.getLocationDes());
+        locationInfoDO.setSubwayLine(locationReq.getSubwayLine());
+        locationInfoDO.setSort(locationReq.getSort());
+        locationInfoDO.setUpdateTime(new Date());
+        locationInfoDO.setYn(1);
+        return locationMapper.update(locationInfoDO) == 1 ? true : false;
+    }
+
 
     public List<AllDistance> getAllDistance(DistanceReq req) {
         log.info("获取全部距离入参:{}", JSONObject.toJSONString(req));
@@ -122,25 +135,76 @@ public class GetOffBusFinalService {
     }
 
 
-    public Double getDistance(DistanceReq req) {
+    public Boolean getDistance(DistanceReq req) {
         log.info("获取直线距离入参:{}", JSONObject.toJSONString(req));
         Configuration weatherConfig = ConfigUtil.getOffBusReminderConfig();
         //起始经纬度
         String startPoint = req.getOriLong() + "," + req.getOriLat();
-        //获取目的地经纬度
-        String endPoint = getOffBusHelper.getEndPoint(req.getUserId());
-        if (endPoint.equals("")) {
-            return Double.valueOf(0);
+        //通过 userId 查询该用户的所有位置
+        List<LocationInfoDO> locationInfoDOS = locationMapper.queryByUserId(req.getUserId());
+        for (LocationInfoDO locationInfoDO : locationInfoDOS) {
+            //判断现在时间是上午还是下午，true为上午，false为下午
+            Boolean isAm = getOffBusHelper.des();
+            if (isAm && locationInfoDO.getSort() == 1 || !isAm && locationInfoDOS.get(locationInfoDOS.size() - 1).getSort()
+                    .equals(locationInfoDO.getSort())) {
+                continue;
+            }
+            //获取目的地经纬度信息
+            String locationKey = locationInfoDO.getLocationId() + LocationSort.message;
+            String endPoint = locationInfoDO.getLocationDes();
+            Double distance = getOffBusHelper.getDistance(startPoint, endPoint, weatherConfig);
+            if (distance < 2000 && !globalCache.hasKey(locationKey)) {
+                String url = "https://api.day.app/DMNK5oTh5FV3RvwpxKvxwB/马上到站了";//指定URL
+                String result = HttpUtil.createGet(url).execute().body();
+                log.info("发送通知结果：{}", result);
+                globalCache.set(locationKey, true, 1800);
+            }
+            if (distance < 800) {
+                String url = "https://api.day.app/DMNK5oTh5FV3RvwpxKvxwB/即将下车了!";//指定URL
+                for (int i = 0; i < 3; i++) {
+                    String result = HttpUtil.createGet(url).execute().body();
+                    log.info("连续发送通知结果：{}", result);
+                }
+            }
+            log.info("距离为：{}", distance);
         }
-        Double distance = getOffBusHelper.getDistance(startPoint, endPoint, weatherConfig);
-        if (distance < 2000 && !globalCache.hasKey("sendMessage")) {
-            String url = "https://api.day.app/DMNK5oTh5FV3RvwpxKvxwB/马上到站了";//指定URL
-            String result = HttpUtil.createGet(url).execute().body();
-            log.info("发送通知结果：{}", result);
-            globalCache.set("sendMessage", true, 1800);
+        return true;
+    }
+
+
+    /**
+     * 通过当前位置推算要计算的下一个位置节点
+     *
+     * @param req
+     * @return
+     */
+    public Boolean initDistance(DistanceReq req) {
+        log.info("初始化距离入参:{}", JSONObject.toJSONString(req));
+        Configuration weatherConfig = ConfigUtil.getOffBusReminderConfig();
+        //起始经纬度
+        String locationSortKey = req.getUserId() + LocationSort.nextSort;
+        String startPoint = req.getOriLong() + "," + req.getOriLat();
+        double nearestDistance = Double.MAX_VALUE;
+        /**
+         * TreeMap: 能够把它保存的记录根据key排序,默认是按升序排序，也可以指定排序的比较器
+         * 距离为 key,顺序为 sort
+         */
+        TreeMap<Double, Integer> disMap = new TreeMap<>();
+        //通过 userId 查询该用户的所有位置
+        List<LocationInfoDO> locationInfoDOS = locationMapper.queryByUserId(req.getUserId());
+        for (LocationInfoDO locationInfoDO : locationInfoDOS) {
+            //获取目的地经纬度信息
+            String endPoint = locationInfoDO.getLocationDes();
+            Double distance = getOffBusHelper.getDistance(startPoint, endPoint, weatherConfig);
+            disMap.put(distance, locationInfoDO.getSort());
         }
-        log.info("距离为：{}", distance);
-        return distance;
+        Iterator<Double> iterator = disMap.keySet().iterator();
+        while (iterator.hasNext()) {
+
+
+        }
+
+        return true;
     }
 
     public String getDes(UserReq req) {

@@ -54,55 +54,11 @@ public class GetOffBusFinalController {
     }
 
     /**
-     * 批量计算距离(弃用)
-     */
-//    @RequestMapping("/getAllDistance")
-//    public RespResult<List<AllDistance>> getAllDistance(DistanceReq req) {
-//        return new RespResult<>(getOffBusFinalService.getAllDistance(req));
-//    }
-
-    /**
      * 获取直线距离
      */
     @RequestMapping("/getDistance")
     public RespResult<Boolean> getDistance(DistanceReq req) {
         return new RespResult<>(getOffBusFinalService.getDistance(req));
-    }
-
-    /**
-     * 初始化位置信息(弃用)
-     */
-//    @RequestMapping("/initDistance")
-//    public RespResult<Boolean> initDistance(DistanceReq req) {
-//        return new RespResult<>(getOffBusFinalService.initDistance(req));
-//    }
-
-    /**
-     * 读取目的地，中文
-     *
-     * @return
-     */
-    @RequestMapping("/getDestination")
-    public RespResult<String> getDes(UserReq req) {
-        return new RespResult<>(getOffBusFinalService.getDes(req));
-    }
-
-    /**
-     * 保存上下班位置信息
-     */
-//    @RequestMapping("/saveLocation")
-//    public RespResult<Integer> saveLocation(WorkAndHomeLocationReq req) {
-//        return new RespResult<>(getOffBusFinalService.getLocation(req));
-//    }
-
-    /**
-     * 获取位置信息
-     *
-     * @return
-     */
-    @RequestMapping("/getWorkAndHomeLocation")
-    public String getWorkAndHomeLocation(LocationReq req) {
-        return getOffBusFinalService.getWorkAndHomeLocation(req);
     }
 
     /**

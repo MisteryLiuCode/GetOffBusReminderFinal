@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +42,7 @@ public class GetOffBusHelper {
      * @return
      */
     public Boolean des() {
+
         // 获取当前时间
         LocalTime now = LocalTime.now();
 
@@ -50,6 +53,23 @@ public class GetOffBusHelper {
         boolean isAm = now.isBefore(am12);
         return isAm;
     }
+
+    /**
+     * 判断是否是工作日，工作日 true,周末 false
+     * @return
+     */
+    public Boolean isWorkDay(){
+        LocalDate today = LocalDate.now();
+        DayOfWeek dayOfWeek = today.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+            System.out.println("今天是周末，不是工作日。");
+            return false;
+        } else {
+            System.out.println("今天是工作日。");
+            return true;
+        }
+    }
+
 
     /**
      * 获取当下位置，根据时间判断，以中午12点为分割线，

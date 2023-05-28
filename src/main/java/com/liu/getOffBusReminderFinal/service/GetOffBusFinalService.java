@@ -101,42 +101,12 @@ public class GetOffBusFinalService {
     }
 
 
-    public List<AllDistance> getAllDistance(DistanceReq req) {
-        log.info("获取全部距离入参:{}", JSONObject.toJSONString(req));
-        //查询此用户id下面的所有位置
-        Configuration weatherConfig = ConfigUtil.getOffBusReminderConfig();
-        List<LocationInfoDO> locationInfoDOList = locationMapper.queryByUserId(req.getUserId());
-        List<AllDistance> resAllDistance = new ArrayList<>();
-        for (LocationInfoDO locationInfoDO : locationInfoDOList) {
-            AllDistance allDistance = new AllDistance();
-            //起始经纬度
-            String startPoint = req.getOriLong() + "," + req.getOriLat();
-            //获取目的地经纬度
-//            String endPoint = getOffBusHelper.getEndPoint(req.getUserId());
-            String endPoint = locationInfoDO.getLocationDes();
-            if (endPoint.equals("")) {
-                allDistance.setDistance((double) 0);
-                allDistance.setLocationId(locationInfoDO.getLocationId());
-                resAllDistance.add(allDistance);
-                continue;
-            }
-            Double distance = getOffBusHelper.getDistance(startPoint, endPoint, weatherConfig);
-            allDistance.setLocationId(locationInfoDO.getLocationId());
-            allDistance.setDistance(distance);
-            if (distance < 2000 && !globalCache.hasKey(locationInfoDO.getLocationId())) {
-                String url = "https://api.day.app/DMNK5oTh5FV3RvwpxKvxwB/马上到站了";//指定URL
-                String result = HttpUtil.createGet(url).execute().body();
-                log.info("发送通知结果：{}", result);
-                globalCache.set(locationInfoDO.getLocationId(), true, 1800);
-            }
-            log.info("距离为：{}", distance);
-        }
-        return resAllDistance;
-    }
-
-
     public Boolean getDistance(DistanceReq req) {
         log.info("获取直线距离入参:{}", JSONObject.toJSONString(req));
+        if (!getOffBusHelper.isWorkDay()){
+            log.info("今天非工作日");
+           return false;
+        }
         Configuration weatherConfig = ConfigUtil.getOffBusReminderConfig();
         //起始经纬度
         String startPoint = req.getOriLong() + "," + req.getOriLat();
@@ -174,42 +144,6 @@ public class GetOffBusFinalService {
         return true;
     }
 
-
-    /**
-     * 通过当前位置推算要计算的下一个位置节点
-     *
-     * @param req
-     * @return
-     */
-    public Boolean initDistance(DistanceReq req) {
-        log.info("初始化距离入参:{}", JSONObject.toJSONString(req));
-        Configuration weatherConfig = ConfigUtil.getOffBusReminderConfig();
-        //起始经纬度
-        String locationSortKey = req.getUserId() + LocationSort.nextSort;
-        String startPoint = req.getOriLong() + "," + req.getOriLat();
-        double nearestDistance = Double.MAX_VALUE;
-        /**
-         * TreeMap: 能够把它保存的记录根据key排序,默认是按升序排序，也可以指定排序的比较器
-         * 距离为 key,顺序为 sort
-         */
-        TreeMap<Double, Integer> disMap = new TreeMap<>();
-        //通过 userId 查询该用户的所有位置
-        List<LocationInfoDO> locationInfoDOS = locationMapper.queryByUserId(req.getUserId());
-        for (LocationInfoDO locationInfoDO : locationInfoDOS) {
-            //获取目的地经纬度信息
-            String endPoint = locationInfoDO.getLocationDes();
-            Double distance = getOffBusHelper.getDistance(startPoint, endPoint, weatherConfig);
-            disMap.put(distance, locationInfoDO.getSort());
-        }
-        Iterator<Double> iterator = disMap.keySet().iterator();
-        while (iterator.hasNext()) {
-
-
-        }
-
-        return true;
-    }
-
     public String getDes(UserReq req) {
         log.info("获取中文目的地入参:{}", JSONObject.toJSONString(req));
         //判断现在时间是上午还是下午，true为上午，false为下午
@@ -227,52 +161,6 @@ public class GetOffBusFinalService {
         return des;
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public Integer getLocation(WorkAndHomeLocationReq req) {
-        log.info("保存上下班入参:{}", JSONObject.toJSONString(req));
-        String point = req.getOriLong() + "," + req.getOriLat();
-        try {
-            UserInfoDO userInfoDO = new UserInfoDO();
-            String time = getOffBusHelper.getTime();
-            //如果为上班位置
-            if (req.getLocationType().equals(LocationEnum.TYPE_1.getCode())) {
-//                userInfoDO.setWorkDes(point);
-                userInfoDO.setUserId(req.getUserId());
-                userInfoDO.setUpdateTime(new Date());
-                return userInfoMapper.update(userInfoDO);
-            } else {
-//                userInfoDO.setHomeDes(point);
-                userInfoDO.setUserId(req.getUserId());
-                userInfoDO.setUpdateTime(new Date());
-                return userInfoMapper.update(userInfoDO);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public String getWorkAndHomeLocation(LocationReq req) {
-        log.info("获取上下班位置信息入参:{}", JSONObject.toJSONString(req));
-        UserInfoDO userInfoDO = userInfoMapper.queryByUserId(req.getUserId());
-        try {
-            //如果为上班位置
-////            if (req.getLocationType().equals(LocationEnum.TYPE_1.getCode())) {
-////                String workDes = userInfoDO.getWorkDes();
-////                log.info("获取的上班位置{}",workDes);
-////                return workDes;
-//
-////            } else {
-////                String homeDes = userInfoDO.getHomeDes();
-////                log.info("获取的下班位置{}",homeDes);
-////                return homeDes;
-//            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-        return "";
-    }
 
     public List<String> inputPrompt(String oriLong, String oriLat, String keywords) {
         log.info("输入提示入参:{},{},{},{}", oriLong, oriLat, keywords);
